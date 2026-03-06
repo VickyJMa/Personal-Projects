@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vicky & Andy's Date Dice 🎲</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f9f1e7;
+    --warm-white: #fffdf9;
+    --blush-light: #f4ddd3;
+    --blush: #dfa897;
+    --rose: #b96b58;
+    --wine: #6b2d2d;
+    --wine-deep: #4a1e1e;
+    --gold: #c8973a;
+    --gold-light: #e8c06a;
+    --ink: #2a1515;
+    --sage: #7a9e7e;
+    --sage-light: #d4e8d6;
+  }
+
+  body {
+    background: var(--parchment);
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(223,168,151,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(107,45,45,0.08) 0%, transparent 55%);
+    font-family: 'Jost', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 48px 24px 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .monogram {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .monogram-line { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .monogram-line.right { background: linear-gradient(90deg, var(--gold), transparent); }
+
+  .monogram-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem; font-weight: 400;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.6rem, 7vw, 4.4rem);
+    font-weight: 600; color: var(--wine);
+    line-height: 1.0; margin-bottom: 4px;
+  }
+
+  h1 em { font-style: italic; font-weight: 400; color: var(--rose); }
+
+  .subtitle {
+    font-size: 0.75rem; font-weight: 300;
+    letter-spacing: 3.5px; text-transform: uppercase;
+    color: var(--blush); margin-top: 10px;
+  }
+
+  /* ── SOURCE TOGGLE (Our Ideas / My Ideas) ── */
+  .source-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 24px auto 0;
+    background: var(--warm-white);
+    border: 1px solid var(--blush-light);
+    border-radius: 100px;
+    padding: 5px;
+    width: fit-content;
+    box-shadow: 0 2px 20px rgba(107,45,45,0.07);
+    position: relative; z-index: 1;
+  }
+
+  .source-btn {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 1px; padding: 9px 22px;
+    border-radius: 100px; border: none; cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: transparent; color: var(--blush);
+    text-transform: uppercase;
+  }
+
+  .source-btn.active {
+    background: var(--wine); color: var(--parchment);
+    box-shadow: 0 2px 14px rgba(107,45,45,0.28);
+  }
+
+  .source-btn.custom-active {
+    background: var(--sage); color: white;
+    box-shadow: 0 2px 14px rgba(122,158,126,0.35);
+  }
+
+  /* ── DICE COUNT TOGGLE ── */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 12px auto 0;
+    background: var(--warm-white);
+    border: 1px solid var(--blush-light);
+    border-radius: 100px;
+    padding: 5px;
+    width: fit-content;
+    box-shadow: 0 2px 20px rgba(107,45,45,0.07);
+    position: relative; z-index: 1;
+  }
+
+  .toggle-btn {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 1px; padding: 9px 24px;
+    border-radius: 100px; border: none; cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: transparent; color: var(--blush);
+    text-transform: uppercase;
+  }
+
+  .toggle-btn.active {
+    background: var(--wine); color: var(--parchment);
+    box-shadow: 0 2px 14px rgba(107,45,45,0.28);
+  }
+
+  /* ── CUSTOM IDEAS PANEL ── */
+  .custom-panel {
+    width: 100%; max-width: 560px;
+    padding: 0 24px;
+    margin-top: 20px;
+    position: relative; z-index: 1;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    opacity: 0;
+  }
+
+  .custom-panel.open {
+    max-height: 600px;
+    opacity: 1;
+  }
+
+  .custom-panel-inner {
+    background: var(--warm-white);
+    border: 1px solid var(--sage-light);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 32px rgba(122,158,126,0.1);
+  }
+
+  .custom-panel-header {
+    background: linear-gradient(135deg, var(--sage) 0%, #5a8260 100%);
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .custom-panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem; font-weight: 400;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .custom-panel-hint {
+    font-size: 0.65rem; font-weight: 300;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 1px;
+  }
+
+  .custom-panel-body { padding: 20px 22px 22px; }
+
+  /* Textarea */
+  .ideas-textarea {
+    width: 100%;
+    min-height: 120px;
+    border: 1.5px solid var(--blush-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--ink);
+    background: var(--parchment);
+    resize: vertical;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .ideas-textarea:focus { border-color: var(--sage); }
+  .ideas-textarea::placeholder { color: var(--blush); }
+
+  .textarea-hint {
+    font-size: 0.65rem; font-weight: 300;
+    color: var(--blush); letter-spacing: 1px;
+    margin-top: 6px; margin-left: 2px;
+  }
+
+  /* Upload row */
+  .upload-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .upload-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--parchment);
+    border: 1.5px dashed var(--sage-light);
+    border-radius: 10px;
+    padding: 10px 18px;
+    cursor: pointer;
+    flex: 1;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .upload-label:hover { border-color: var(--sage); background: var(--sage-light); }
+
+  .upload-label input { display: none; }
+
+  .upload-icon { font-size: 1.1rem; }
+
+  .upload-text {
+    font-size: 0.75rem; font-weight: 400;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--sage);
+  }
+
+  .upload-filename {
+    font-size: 0.72rem; font-weight: 300;
+    color: var(--blush); font-style: italic;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Save button */
+  .save-btn {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    background: var(--sage); color: white;
+    border: none; border-radius: 100px;
+    padding: 10px 24px; cursor: pointer;
+    box-shadow: 0 3px 0 #5a8260, 0 6px 18px rgba(122,158,126,0.25);
+    transition: transform 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+  }
+
+  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #5a8260, 0 10px 22px rgba(122,158,126,0.3); }
+  .save-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #5a8260; }
+
+  /* Count badge */
+  .ideas-count {
+    display: inline-block;
+    background: var(--sage-light);
+    color: var(--sage);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-top: 10px;
+    transition: all 0.3s;
+  }
+
+  .ideas-count.zero { background: var(--blush-light); color: var(--blush); }
+
+  /* ── DICE STAGE ── */
+  .dice-stage {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 20px;
+    padding: 36px 24px 8px;
+    flex-wrap: wrap;
+    position: relative; z-index: 1;
+    min-height: 220px;
+  }
+
+  .die-wrapper {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    opacity: 0; transform: translateY(24px);
+    animation: fadeUp 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .die-wrapper:nth-child(1) { animation-delay: 0.05s; }
+  .die-wrapper:nth-child(2) { animation-delay: 0.15s; }
+  .die-wrapper:nth-child(3) { animation-delay: 0.25s; }
+
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .die-label {
+    font-size: 0.62rem; font-weight: 500;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--rose); opacity: 0.8;
+  }
+
+  .die {
+    width: 130px; height: 130px;
+    background: var(--warm-white);
+    border-radius: 22px;
+    border: 1.5px solid var(--blush-light);
+    box-shadow: 0 5px 0 var(--blush), 0 10px 36px rgba(107,45,45,0.13), inset 0 1px 0 #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .die:hover {
+    transform: translateY(-4px) rotate(-1deg);
+    box-shadow: 0 10px 0 var(--blush), 0 18px 44px rgba(107,45,45,0.18), inset 0 1px 0 #fff;
+  }
+
+  .die:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 var(--blush), 0 4px 16px rgba(107,45,45,0.1), inset 0 1px 0 #fff;
+  }
+
+  /* Custom-mode dice get sage accent */
+  .die.custom-die {
+    border-color: var(--sage-light);
+    box-shadow: 0 5px 0 var(--sage-light), 0 10px 36px rgba(122,158,126,0.13), inset 0 1px 0 #fff;
+  }
+
+  .die.custom-die:hover {
+    box-shadow: 0 10px 0 var(--sage-light), 0 18px 44px rgba(122,158,126,0.18), inset 0 1px 0 #fff;
+  }
+
+  .die.rolling { animation: rollDie 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+  @keyframes rollDie {
+    0%   { transform: rotate(0deg) scale(1); }
+    20%  { transform: rotate(-18deg) scale(0.93); }
+    40%  { transform: rotate(22deg) scale(1.07); }
+    60%  { transform: rotate(-12deg) scale(0.97); }
+    80%  { transform: rotate(6deg) scale(1.02); }
+    100% { transform: rotate(0deg) scale(1); }
+  }
+
+  .die-face {
+    font-size: 2.4rem; text-align: center;
+    padding: 10px; line-height: 1.3;
+    transition: opacity 0.12s ease;
+    user-select: none;
+  }
+
+  .die-face.hidden { opacity: 0; }
+
+  /* ── ROLL BUTTON ── */
+  .roll-btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem; font-style: italic;
+    background: var(--wine); color: var(--parchment);
+    border: none; padding: 15px 56px;
+    border-radius: 100px; cursor: pointer;
+    margin: 28px auto 0; display: block;
+    position: relative; z-index: 1;
+    box-shadow: 0 5px 0 var(--wine-deep), 0 10px 28px rgba(107,45,45,0.28);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.3s ease;
+    letter-spacing: 0.5px;
+  }
+
+  .roll-btn.custom-mode {
+    background: var(--sage);
+    box-shadow: 0 5px 0 #4a7050, 0 10px 28px rgba(122,158,126,0.28);
+  }
+
+  .roll-btn:hover { transform: translateY(-3px); }
+  .roll-btn:active { transform: translateY(4px); }
+  .roll-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  /* ── RESULT CARD ── */
+  .result-reveal {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 540px;
+    padding: 0 24px; margin-top: 32px;
+  }
+
+  .date-card {
+    background: var(--warm-white);
+    border: 1px solid var(--blush-light);
+    border-radius: 20px; overflow: hidden;
+    transform: scaleY(0.6) translateY(-16px);
+    transform-origin: top center;
+    opacity: 0; pointer-events: none;
+    transition: transform 0.5s cubic-bezier(0.34, 1.3, 0.64, 1), opacity 0.35s ease;
+    box-shadow: 0 8px 48px rgba(107,45,45,0.12), 0 1px 0 #fff inset;
+  }
+
+  .date-card.visible { transform: scaleY(1) translateY(0); opacity: 1; pointer-events: auto; }
+
+  .card-header {
+    background: linear-gradient(135deg, var(--wine) 0%, var(--rose) 100%);
+    padding: 15px 26px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.4s ease;
+  }
+
+  .card-header.custom-header {
+    background: linear-gradient(135deg, var(--sage) 0%, #5a8260 100%);
+  }
+
+  .card-header-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.72rem; font-weight: 400;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .card-header-hearts { color: rgba(255,255,255,0.55); font-size: 0.75rem; letter-spacing: 4px; }
+
+  .card-body-single { padding: 34px 36px 30px; text-align: center; }
+
+  .single-emoji {
+    font-size: 3rem; display: block; margin-bottom: 14px;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .single-result {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.45rem, 4vw, 2rem);
+    font-style: italic; color: var(--wine); line-height: 1.4; margin-bottom: 16px;
+  }
+
+  .single-result.custom-text { color: var(--sage); }
+
+  .single-tagline {
+    font-size: 0.68rem; font-weight: 300;
+    letter-spacing: 2.5px; text-transform: uppercase; color: var(--blush);
+  }
+
+  .card-body-triple { padding: 6px 0; }
+
+  .triple-row {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--blush-light);
+    opacity: 0; transform: translateX(-14px);
+    transition: opacity 0.38s ease, transform 0.38s ease;
+  }
+
+  .triple-row:last-child { border-bottom: none; }
+  .triple-row.shown { opacity: 1; transform: translateX(0); }
+  .triple-row:nth-child(1).shown { transition-delay: 0.08s; }
+  .triple-row:nth-child(2).shown { transition-delay: 0.2s; }
+  .triple-row:nth-child(3).shown { transition-delay: 0.32s; }
+
+  .triple-icon { font-size: 1.9rem; min-width: 42px; text-align: center; }
+
+  .triple-label {
+    font-size: 0.58rem; font-weight: 500;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 4px;
+  }
+
+  .triple-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem; font-style: italic; color: var(--wine); line-height: 1.3;
+  }
+
+  .card-footer {
+    background: var(--parchment); border-top: 1px solid var(--blush-light);
+    padding: 11px 26px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+
+  .card-footer-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-light)); }
+  .card-footer-line.right { background: linear-gradient(90deg, var(--gold-light), transparent); }
+
+  .card-footer-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem; font-style: italic; letter-spacing: 2px; color: var(--gold); white-space: nowrap;
+  }
+
+  /* ── PAGE FOOTER ── */
+  .page-footer {
+    text-align: center; padding: 40px 20px 28px;
+    font-size: 0.68rem; font-weight: 300;
+    color: var(--blush); position: relative; z-index: 1; letter-spacing: 1.5px;
+  }
+
+  /* ── CONFETTI ── */
+  .confetti-piece {
+    position: fixed; top: -12px;
+    animation: confettiFall linear forwards;
+    pointer-events: none; z-index: 999;
+  }
+
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(800deg); opacity: 0; }
+  }
+
+  .corner { position: fixed; pointer-events: none; z-index: 0; opacity: 0.06; font-size: 4rem; }
+  .corner.tl { top: 16px; left: 16px; }
+  .corner.br { bottom: 16px; right: 16px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--ink); color: var(--parchment);
+    font-size: 0.78rem; font-weight: 400; letter-spacing: 1px;
+    padding: 12px 24px; border-radius: 100px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+    opacity: 0; z-index: 1000; white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="corner tl">🎲</div>
+<div class="corner br">🎲</div>
+
+<header>
+  <div class="monogram">
+    <div class="monogram-line"></div>
+    <span class="monogram-text">V &amp; A</span>
+    <div class="monogram-line right"></div>
+  </div>
+  <h1>Date <em>Dice</em></h1>
+  <p class="subtitle">Roll for your next adventure together</p>
+</header>
+
+<!-- Source toggle -->
+<div class="source-bar">
+  <button class="source-btn active" id="srcDefault" onclick="setSource('default')">✨ Our Ideas</button>
+  <button class="source-btn" id="srcCustom" onclick="setSource('custom')">📝 My List</button>
+</div>
+
+<!-- Custom ideas panel -->
+<div class="custom-panel" id="customPanel">
+  <div class="custom-panel-inner">
+    <div class="custom-panel-header">
+      <span class="custom-panel-title">Your Date Ideas</span>
+      <span class="custom-panel-hint">one idea per line</span>
+    </div>
+    <div class="custom-panel-body">
+      <textarea class="ideas-textarea" id="ideasTextarea"
+        placeholder="Rooftop dinner&#10;Drive-in movie&#10;Ferry to Staten Island&#10;Pottery class&#10;..."></textarea>
+      <p class="textarea-hint">Type or paste ideas above — one per line. Or upload a .txt file from your Notes app.</p>
+
+      <div class="upload-row">
+        <label class="upload-label">
+          <input type="file" accept=".txt,text/plain" id="fileInput" onchange="handleFileUpload(event)">
+          <span class="upload-icon">📎</span>
+          <div>
+            <span class="upload-text">Upload .txt file</span>
+            <span class="upload-filename" id="uploadFilename">No file chosen</span>
+          </div>
+        </label>
+        <button class="save-btn" onclick="saveCustomIdeas()">Save List ✓</button>
+      </div>
+
+      <div id="ideasCount" class="ideas-count zero">0 ideas saved</div>
+    </div>
+  </div>
+</div>
+
+<!-- Dice count toggle -->
+<div class="toggle-wrap">
+  <button class="toggle-btn active" id="btn1" onclick="setMode(1)">🎲 One Die</button>
+  <button class="toggle-btn" id="btn3" onclick="setMode(3)">🎲🎲🎲 Three Dice</button>
+</div>
+
+<div class="dice-stage" id="diceStage"></div>
+
+<button class="roll-btn" id="rollBtn" onclick="rollAll()">Roll the Dice ✨</button>
+
+<div class="result-reveal">
+  <div class="date-card" id="dateCard"></div>
+</div>
+
+<div class="page-footer">made with ♥ for vicky &amp; andy</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DEFAULT DATA ──
+const DEFAULT_DATA = {
+  activity: [
+    { text: "Cook a new recipe together", emoji: "🍝" },
+    { text: "Movie marathon with blanket forts", emoji: "🎬" },
+    { text: "Take a long evening walk", emoji: "🌙" },
+    { text: "Visit a local museum", emoji: "🖼️" },
+    { text: "Go wine or cocktail tasting", emoji: "🍷" },
+    { text: "Play board games all night", emoji: "🎮" },
+    { text: "Try a cooking class together", emoji: "👨‍🍳" },
+    { text: "Go stargazing somewhere quiet", emoji: "🌟" },
+    { text: "Hit up a local farmers market", emoji: "🥬" },
+    { text: "Have a picnic in the park", emoji: "🧺" },
+    { text: "Go bowling or mini golf", emoji: "🎳" },
+    { text: "Binge a brand new TV series", emoji: "📺" },
+    { text: "Try an escape room", emoji: "🔐" },
+    { text: "Visit a botanical garden", emoji: "🌸" },
+    { text: "Do a paint & sip night", emoji: "🎨" },
+    { text: "Go to a comedy show", emoji: "😂" },
+    { text: "Take a spontaneous day trip", emoji: "🚗" },
+    { text: "Do a puzzle together", emoji: "🧩" },
+  ],
+  vibe: [
+    { text: "Cozy & romantic", emoji: "🕯️" },
+    { text: "Spontaneous & wild", emoji: "🌪️" },
+    { text: "Chill & low-key", emoji: "😌" },
+    { text: "Adventurous", emoji: "🧗" },
+    { text: "Fancy & indulgent", emoji: "💎" },
+    { text: "Nostalgic & sentimental", emoji: "📷" },
+    { text: "Silly & playful", emoji: "🤪" },
+    { text: "Peaceful & slow", emoji: "🍃" },
+    { text: "Exciting & new", emoji: "🎉" },
+    { text: "Intimate & quiet", emoji: "🤫" },
+  ],
+  treat: [
+    { text: "End with ice cream", emoji: "🍦" },
+    { text: "Treat yourselves to dessert", emoji: "🍰" },
+    { text: "Open a bottle of something nice", emoji: "🥂" },
+    { text: "Get takeout from your fave spot", emoji: "🥡" },
+    { text: "Make homemade cocktails", emoji: "🍹" },
+    { text: "Share a charcuterie board", emoji: "🧀" },
+    { text: "Try a new café", emoji: "☕" },
+    { text: "Get matching snacks", emoji: "🍿" },
+    { text: "Make a fancy hot chocolate", emoji: "🍫" },
+    { text: "Order pizza and eat in bed", emoji: "🍕" },
+  ]
+};
+
+const CUSTOM_EMOJIS = ["💑","🌹","🎭","🌆","🍾","🎠","🌊","🏔️","🎪","🛶","🎡","🌴","🍜","🎸","🎬","🌙","🏖️","🎯","🎲","✨"];
+const LABELS = { activity: "What to Do", vibe: "The Vibe", treat: "Treat Yourselves" };
+const KEYS = ["activity", "vibe", "treat"];
+
+let mode = 1;
+let source = 'default'; // 'default' | 'custom'
+let isRolling = false;
+let lastResults = {};
+let customIdeas = []; // saved list
+
+// ── SOURCE ──
+function setSource(s) {
+  source = s;
+  const isCustom = s === 'custom';
+
+  document.getElementById('srcDefault').className = 'source-btn' + (isCustom ? '' : ' active');
+  document.getElementById('srcCustom').className = 'source-btn' + (isCustom ? ' custom-active' : '');
+
+  const panel = document.getElementById('customPanel');
+  panel.classList.toggle('open', isCustom);
+
+  const rollBtn = document.getElementById('rollBtn');
+  rollBtn.classList.toggle('custom-mode', isCustom);
+
+  // Update dice styling
+  document.querySelectorAll('.die').forEach(d => d.classList.toggle('custom-die', isCustom));
+
+  hideCard();
+  renderDice();
+}
+
+// ── CUSTOM IDEAS ──
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('uploadFilename').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.getElementById('ideasTextarea').value = ev.target.result;
+    showToast('📎 File loaded! Hit "Save List" to apply.');
+  };
+  reader.readAsText(file);
+}
+
+function saveCustomIdeas() {
+  const raw = document.getElementById('ideasTextarea').value;
+  const lines = raw.split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 1 && !l.startsWith('#')); // skip blank & comment lines
+
+  customIdeas = lines;
+  updateCountBadge();
+
+  if (lines.length === 0) {
+    showToast('⚠️ No ideas found — add one per line!');
+    return;
+  }
+
+  showToast(`✓ ${lines.length} ideas saved to your list!`);
+  hideCard();
+  renderDice();
+}
+
+function updateCountBadge() {
+  const el = document.getElementById('ideasCount');
+  const n = customIdeas.length;
+  el.textContent = n === 0 ? '0 ideas saved' : `${n} idea${n === 1 ? '' : 's'} saved`;
+  el.className = 'ideas-count' + (n === 0 ? ' zero' : '');
+}
+
+function getCustomItem() {
+  if (customIdeas.length === 0) return { text: "Add your ideas above!", emoji: "📝" };
+  const line = customIdeas[Math.floor(Math.random() * customIdeas.length)];
+  const emoji = CUSTOM_EMOJIS[Math.floor(Math.random() * CUSTOM_EMOJIS.length)];
+  return { text: line, emoji };
+}
+
+// ── DICE MODE ──
+function setMode(n) {
+  mode = n;
+  document.getElementById('btn1').classList.toggle('active', n === 1);
+  document.getElementById('btn3').classList.toggle('active', n === 3);
+  hideCard();
+  renderDice();
+}
+
+function hideCard() {
+  const c = document.getElementById('dateCard');
+  c.classList.remove('visible');
+  setTimeout(() => { c.innerHTML = ''; }, 400);
+}
+
+function renderDice() {
+  const stage = document.getElementById('diceStage');
+  stage.innerHTML = '';
+  lastResults = {};
+  const keys = mode === 1 ? ['activity'] : KEYS;
+  const isCustom = source === 'custom';
+
+  keys.forEach(key => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'die-wrapper';
+
+    const label = document.createElement('div');
+    label.className = 'die-label';
+    // In custom mode with 1 die, just say "Your Idea"
+    label.textContent = (isCustom && mode === 1) ? 'Your Idea' : LABELS[key];
+
+    const die = document.createElement('div');
+    die.className = 'die' + (isCustom ? ' custom-die' : '');
+    die.id = `die-${key}`;
+    die.onclick = () => rollSingle(key);
+    die.title = 'Click to roll just this die';
+
+    const face = document.createElement('div');
+    face.className = 'die-face';
+    face.id = `face-${key}`;
+    face.textContent = isCustom ? '📝' : '🎲';
+
+    die.appendChild(face);
+    wrapper.appendChild(label);
+    wrapper.appendChild(die);
+    stage.appendChild(wrapper);
+  });
+}
+
+function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function animateDie(key, callback) {
+  const die = document.getElementById(`die-${key}`);
+  const face = document.getElementById(`face-${key}`);
+  const isCustom = source === 'custom';
+
+  die.classList.add('rolling');
+  face.classList.add('hidden');
+
+  const flashes = isCustom
+    ? ['📝','💫','✨','❓','📝','💫','✨','❓','📝']
+    : ['🎲','✨','💫','❓','🎲','✨','💫','❓','🎲'];
+
+  let f = 0;
+  const iv = setInterval(() => {
+    face.textContent = flashes[f % flashes.length];
+    face.classList.remove('hidden');
+    f++;
+    if (f >= 9) {
+      clearInterval(iv);
+      const result = isCustom ? getCustomItem() : getRandom(DEFAULT_DATA[key]);
+      face.textContent = result.emoji;
+      lastResults[key] = result;
+      callback && callback(result);
+    }
+  }, 58);
+
+  setTimeout(() => die.classList.remove('rolling'), 680);
+}
+
+function rollSingle(key) {
+  if (isRolling) return;
+  isRolling = true;
+  hideCard();
+  animateDie(key, () => {
+    isRolling = false;
+    if (mode === 1) { showSingleCard(lastResults['activity']); launchConfetti(); }
+    else { showTripleCard(); }
+  });
+}
+
+function rollAll() {
+  if (isRolling) return;
+  isRolling = true;
+  hideCard();
+  document.getElementById('rollBtn').disabled = true;
+  const keys = mode === 1 ? ['activity'] : KEYS;
+  let done = 0;
+  keys.forEach((key, i) => {
+    setTimeout(() => {
+      animateDie(key, () => {
+        done++;
+        if (done === keys.length) {
+          isRolling = false;
+          document.getElementById('rollBtn').disabled = false;
+          if (mode === 1) { showSingleCard(lastResults['activity']); }
+          else { showTripleCard(); }
+          launchConfetti();
+        }
+      });
+    }, i * 130);
+  });
+}
+
+function showSingleCard(item) {
+  const isCustom = source === 'custom';
+  const card = document.getElementById('dateCard');
+  card.innerHTML = `
+    <div class="card-header ${isCustom ? 'custom-header' : ''}">
+      <span class="card-header-text">Tonight's Date</span>
+      <span class="card-header-hearts">♥ ♥ ♥</span>
+    </div>
+    <div class="card-body-single">
+      <span class="single-emoji">${item.emoji}</span>
+      <div class="single-result ${isCustom ? 'custom-text' : ''}">${item.text}</div>
+      <div class="single-tagline">Your adventure awaits ✦</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-footer-line"></div>
+      <span class="card-footer-text">Vicky &amp; Andy</span>
+      <div class="card-footer-line right"></div>
+    </div>`;
+  requestAnimationFrame(() => {
+    card.classList.add('visible');
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
+  });
+}
+
+function showTripleCard() {
+  const isCustom = source === 'custom';
+  const rows = KEYS.map(k => lastResults[k] ? { label: LABELS[k], ...lastResults[k] } : null).filter(Boolean);
+  if (!rows.length) return;
+  const card = document.getElementById('dateCard');
+  card.innerHTML = `
+    <div class="card-header ${isCustom ? 'custom-header' : ''}">
+      <span class="card-header-text">Tonight's Date Plan</span>
+      <span class="card-header-hearts">♥ ♥ ♥</span>
+    </div>
+    <div class="card-body-triple">
+      ${rows.map(r => `
+        <div class="triple-row">
+          <div class="triple-icon">${r.emoji}</div>
+          <div class="triple-content">
+            <div class="triple-label">${r.label}</div>
+            <div class="triple-text">${r.text}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="card-footer">
+      <div class="card-footer-line"></div>
+      <span class="card-footer-text">Vicky &amp; Andy</span>
+      <div class="card-footer-line right"></div>
+    </div>`;
+  requestAnimationFrame(() => {
+    card.classList.add('visible');
+    setTimeout(() => {
+      card.querySelectorAll('.triple-row').forEach(r => r.classList.add('shown'));
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  });
+}
+
+function launchConfetti() {
+  const colors = source === 'custom'
+    ? ['#7a9e7e','#c8973a','#5a8260','#d4e8d6','#e8c06a','#fffdf9']
+    : ['#b96b58','#c8973a','#6b2d2d','#dfa897','#e8c06a','#fffdf9'];
+  for (let i = 0; i < 44; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDuration = (1.4 + Math.random() * 1.8) + 's';
+    p.style.animationDelay = (Math.random() * 0.7) + 's';
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    p.style.width = (6 + Math.random() * 5) + 'px';
+    p.style.height = (6 + Math.random() * 5) + 'px';
+    document.body.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+renderDice();
+</script>
+</body>
+</html>
